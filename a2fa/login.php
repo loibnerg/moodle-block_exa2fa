@@ -11,7 +11,6 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -49,6 +48,8 @@ $context = context_system::instance();
 $PAGE->set_url("$CFG->httpswwwroot/auth/a2fa/login.php");
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('login');
+
+$standard = optional_param('standard', 0, PARAM_INT);
 
 /// Initialize variables
 $errormsg = '';

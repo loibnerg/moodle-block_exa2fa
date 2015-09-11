@@ -49,38 +49,53 @@ class auth_plugin_a2fa extends auth_plugin_base {
      */
     function user_login ($username, $password) {
         global $CFG, $DB, $USER;
-	$token = required_param('token', PARAM_TEXT);
+	$token = optional_param('token', "", PARAM_TEXT);
 	
-	if ($user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
-		$valid_login = validate_internal_user_password($user, $password);
-		if($valid_login && $user->auth == 'a2fa' && !empty($token)){
-			$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
-			$fid = $field->id;
-			$uid = $user->id;
-			
-			$ga = new PHPGangsta_GoogleAuthenticator();
-			$secret = $DB->get_record('user_info_data', array('fieldid'=>$fid, 'userid'=>$uid));
-			if(empty($secret->data)){
-				redirect($CFG->wwwroot.'/auth/a2fa/error.php');
-				return false;
-			}
-			else{
-				$checkResult = $ga->verifyCode($secret->data, $token, 2);
-				if($checkResult){
-					return true;
-				}
-				else{
+	if(!empty($token)){
+		if ($user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
+			$valid_login = validate_internal_user_password($user, $password);
+			if($valid_login && $user->auth == 'a2fa' && !empty($token)){
+				$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
+				$fid = $field->id;
+				$uid = $user->id;
+				
+				$ga = new PHPGangsta_GoogleAuthenticator();
+				$secret = $DB->get_record('user_info_data', array('fieldid'=>$fid, 'userid'=>$uid));
+				if(empty($secret->data)){
+					redirect($CFG->wwwroot.'/auth/a2fa/error.php');
 					return false;
 				}
+				else{
+					$checkResult = $ga->verifyCode($secret->data, $token, 2);
+					if($checkResult){
+						return true;
+					}
+					else{
+						return false;
+					}
+				}
+			}
+			else{
+				return false;
 			}
 		}
-		else{
+	}else{
+		if (!$user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
 			return false;
 		}
+		if (!validate_internal_user_password($user, $password)) {
+			return false;
+		}	
+		 if ($password === 'changeme') {
+            // force the change - this is deprecated and it makes sense only for manual auth,
+            // because most other plugins can not change password easily or
+            // passwords are always specified by users
+            set_user_preference('auth_forcepasswordchange', true, $user->id);
+        }
+        return true;
 	}
-	else{
-		return false;
-	}
+	
+	
     }
 
     function loginpage_hook() {

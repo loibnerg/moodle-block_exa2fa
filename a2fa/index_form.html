@@ -15,6 +15,7 @@ if (empty($CFG->authloginviaemail)) {
 } else {
     $strusername = get_string('usernameemail');
 }
+
 ?>
 <div class="loginbox clearfix <?php echo $columns ?>">
   <div class="loginpanel">
@@ -44,11 +45,14 @@ if (empty($CFG->authloginviaemail)) {
             <div class="form-input">
               <input type="password" name="password" id="password" size="15" value="" <?php echo $autocomplete; ?> />
             </div>
+		<?php if($standard==0){ ?>
 	    <div class="form-label"><label for="token">Token</label></div>
 	    <div class="form-input">
               <input type="text" name="token" id="token" size="15" value="" />
             </div>
-          </div>
+			<?php }?> 
+         </div>
+		  
             <div class="clearer"><!-- --></div>
               <?php if (isset($CFG->rememberusername) and $CFG->rememberusername == 2) { ?>
               <div class="rememberpass">
