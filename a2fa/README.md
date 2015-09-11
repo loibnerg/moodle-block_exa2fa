@@ -42,3 +42,6 @@ yourmoodlesite.com/auth/a2fa/login.php
 
 
 You could make this login page the default for all users but if a user does not have the A2FA set up or enabled they will not be able to login. So rather, just have your A2FA user go to the above url to login.
+
+********************GTN***************
+If you want to select between manual and a2fa login procedure, change Alternative Login URL of your Moodle installation to: yourmoodle/auth/a2fa/index.php
