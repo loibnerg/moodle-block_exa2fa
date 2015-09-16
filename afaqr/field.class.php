@@ -40,11 +40,11 @@ class profile_field_afaqr extends profile_field_base {
         $data = parent::display_data();
         $current_user = $DB->get_record('user', array('id'=>$this->userid)); 
 		$site = $DB->get_record('course', array('id'=>1));
-		$urlencoded = urlencode('otpauth://totp/'.str_replace(' ','+',$site->fullname).'-'.$current_user->firstname.'-'.$current_user->lastname.'?secret='.$data.'');
+		$urlencoded = urlencode('otpauth://totp/'.str_replace(' ','-',$site->fullname).'-'.$current_user->firstname.'-'.$current_user->lastname.'?secret='.$data.'');
         $src = 'https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl='.$urlencoded.'';
 
         $img =  '<img src="'.$src.'"/>';
-		$userinfo = urlencode(str_replace(' ','+',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
+		$userinfo = urlencode(str_replace(' ','-',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
 		$url = new moodle_url('/auth/a2fa/sendmail.php', array('userid'=>$current_user->id));
 		
 		$link="";
@@ -79,7 +79,7 @@ class profile_field_afaqr extends profile_field_base {
 		$current_user = $DB->get_record('user', array('id'=>$this->userid)); 
 		$site = $DB->get_record('course', array('id'=>1));
 		//$urlencoded = urlencode();
-        $userinfo = urlencode(str_replace(' ','+',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
+        $userinfo = urlencode(str_replace(' ','-',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
 		$url = new moodle_url('/auth/a2fa/sendmail.php', array('userid'=>$current_user->id));
         // Create the form field.
         $mform->addElement($fieldtype, $this->inputname, format_string($this->field->name), 'maxlength="'.$maxlength.'" size="'.$size.'" ');
