@@ -40,8 +40,10 @@ if (isloggedin() and !isguestuser()){
 	redirect(new moodle_url('/my'));
 }
 
-echo html_writer::tag('h4', 'W&auml;hlen Sie eine Authentifizierungsmethode:');
-echo html_writer::empty_tag('br').html_writer::empty_tag('br');
-echo html_writer::link(new moodle_url('/auth/a2fa/login.php'), '2-Faktoren Authentifizierung');
-echo html_writer::empty_tag('br').html_writer::empty_tag('br');
-echo html_writer::link(new moodle_url('/auth/a2fa/login.php?standard=1'), 'Standard-Login');
+$content = html_writer::tag('h4', 'W&auml;hlen Sie eine Authentifizierungsmethode:');
+$content .= html_writer::empty_tag('br').html_writer::empty_tag('br');
+$content .= html_writer::link(new moodle_url('/auth/a2fa/login.php'), '2-Faktoren Authentifizierung');
+$content .= html_writer::empty_tag('br').html_writer::empty_tag('br');
+$content .= html_writer::link(new moodle_url('/auth/a2fa/login.php?standard=1'), 'Standard-Login');
+
+echo html_writer::div(html_writer::div(html_writer::div($content, '', array('style'=>'position: relative; float: left; left: -50%;')), '', array('style'=>'position: relative; float: left; left: 50%;')), '', array('style'=>'position: relative; overflow: hidden;'));
