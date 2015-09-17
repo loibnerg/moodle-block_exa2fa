@@ -36,6 +36,17 @@ if(is_siteadmin($USER)){
 	$img =  '<img src="'.$src.'"/>';
 
 	$userreceiver = $DB->get_record('user', array('id'=>$userid));
+	$moodle = $DB->get_record('course', array('id'=>1));
+	
+	$message_content = " <h2>Willkommen bei ".$moodle->fullname."</h2>
+	
+	<p>Um sich in diesem System anmelden zu können, brauchen Sie einen Google Authenticator Token. 
+	Scannen Sie zur Erstellung eines neuen Kontos in der App entweder den unten stehenden QR-Code oder geben Sie den Klartextcode ein.</p><br/>
+	<p> 
+	".$img."
+	<br/>
+	".$secret."
+	";
 
 	$message_output = new message_output_email();
 
@@ -45,11 +56,10 @@ if(is_siteadmin($USER)){
 	$eventdata->name              = 'qrcode'; //this is the message name from messages.php
 	$eventdata->userfrom          = $USER;
 	$eventdata->userto            = $userreceiver;
-	$eventdata->subject           = "QR Code für Authentifizierung Test";
+	$eventdata->subject           = "QR Code für Authentifizierung";
 	$eventdata->fullmessage       = "";
 	$eventdata->fullmessageformat = FORMAT_MARKDOWN;
-	$eventdata->fullmessagehtml   = "Scannen Sie folgenden QR Code mit der Google Authenticator App um einen Token für die Moodle-Anmeldung 
-		generieren zu können: </br>".$img."</br></br> Oder geben Sie alternativ folgenden Code in Ihre App ein: ".$secret;
+	$eventdata->fullmessagehtml   = $message_content;
 	$eventdata->smallmessage      = '';
 	$eventdata->notification      = 1; //this is only set to 0 for personal messages between users
 	if($message_output->send_message($eventdata)){
