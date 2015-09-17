@@ -34,11 +34,11 @@ $PAGE->navbar->ignore_active();
 $loginsite = get_string("loginsite");
 $PAGE->navbar->add($loginsite);
 
-echo $OUTPUT->header();
-
 if (isloggedin() and !isguestuser()){
 	redirect(new moodle_url('/my'));
 }
+
+echo $OUTPUT->header();
 
 $content = html_writer::tag('h4', 'W&auml;hlen Sie eine Authentifizierungsmethode:');
 $content .= html_writer::empty_tag('br').html_writer::empty_tag('br');
