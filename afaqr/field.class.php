@@ -69,29 +69,31 @@ class profile_field_afaqr extends profile_field_base {
      * @param moodleform $mform
      */
     public function edit_field_add($mform) {
-	global $CFG, $PAGE, $DB;
-	$PAGE->requires->jquery();
-	$PAGE->requires->js('/user/profile/field/afaqr/js/newsecret.js');
-	$size = 50;
-        $maxlength = 255;
-        $fieldtype = 'text';
-		
+		global $CFG, $PAGE, $DB;
+		$PAGE->requires->jquery();
+		$PAGE->requires->js('/user/profile/field/afaqr/js/newsecret.js');
+		$size = 50;
+	    $maxlength = 255;
+	    $fieldtype = 'text';
+			
 		$current_user = $DB->get_record('user', array('id'=>$this->userid)); 
 		$site = $DB->get_record('course', array('id'=>1));
-		//$urlencoded = urlencode();
-        $userinfo = urlencode(str_replace(' ','-',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
-		$url = new moodle_url('/auth/a2fa/sendmail.php', array('userid'=>$current_user->id));
-        // Create the form field.
-        $mform->addElement($fieldtype, $this->inputname, format_string($this->field->name), 'maxlength="'.$maxlength.'" size="'.$size.'" ');
-        $mform->setType($this->inputname, PARAM_TEXT);
-	$mform->addElement('hidden', 'a2fa_baseurl', $CFG->wwwroot);
-	$mform->setType('a2fa_baseurl', PARAM_TEXT);
-	$mform->addElement('hidden', 'a2fa_url', $url->out(false));
-	$mform->setType('a2fa_url', PARAM_TEXT);
-	$mform->addElement('hidden', 'a2fa_userinfo', $userinfo);
-	$mform->setType('a2fa_userinfo', PARAM_TEXT);
-	$mform->addElement('button', 'newsecret', get_string('newsecret', 'profilefield_afaqr'));
-	$mform->setType('newsecret', PARAM_TEXT);
+			
+		if($current_user){
+		    $userinfo = urlencode(str_replace(' ','-',$site->fullname).":".$current_user->firstname."-".$current_user->lastname);
+			$url = new moodle_url('/auth/a2fa/sendmail.php', array('userid'=>$current_user->id));
+		    // Create the form field.
+		    $mform->addElement($fieldtype, $this->inputname, format_string($this->field->name), 'maxlength="'.$maxlength.'" size="'.$size.'" ');
+		    $mform->setType($this->inputname, PARAM_TEXT);
+			$mform->addElement('hidden', 'a2fa_baseurl', $CFG->wwwroot);
+			$mform->setType('a2fa_baseurl', PARAM_TEXT);
+			$mform->addElement('hidden', 'a2fa_url', $url->out(false));
+			$mform->setType('a2fa_url', PARAM_TEXT);
+			$mform->addElement('hidden', 'a2fa_userinfo', $userinfo);
+			$mform->setType('a2fa_userinfo', PARAM_TEXT);
+			$mform->addElement('button', 'newsecret', get_string('newsecret', 'profilefield_afaqr'));
+			$mform->setType('newsecret', PARAM_TEXT);
+		}
     }
 
 }
