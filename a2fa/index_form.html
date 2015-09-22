@@ -34,7 +34,7 @@ if (empty($CFG->authloginviaemail)) {
               echo html_writer::end_tag('div');
           }
         ?>
-        <form action="<?php echo $CFG->httpswwwroot; ?>/auth/a2fa/login.php" method="post" id="login" <?php echo $autocomplete; ?> >
+        <form action="<?php echo $CFG->httpswwwroot; ?>/auth/a2fa/login.php?standard=<?php echo $standard;?>" method="post" id="login" <?php echo $autocomplete; ?> >
           <div class="loginform">
             <div class="form-label"><label for="username"><?php echo($strusername) ?></label></div>
             <div class="form-input">
@@ -46,7 +46,7 @@ if (empty($CFG->authloginviaemail)) {
               <input type="password" name="password" id="password" size="15" value="" <?php echo $autocomplete; ?> />
             </div>
 		<?php if($standard==0){ ?>
-	    <div class="form-label"><label for="token">Token</label></div>
+	    <div class="form-label"><label for="token">Google Authenticator Code</label></div>
 	    <div class="form-input">
               <input type="text" name="token" id="token" size="15" value="" />
             </div>
@@ -77,7 +77,7 @@ if (empty($CFG->authloginviaemail)) {
         <div class="desc">
           <?php print_string("someallowguest") ?>
         </div>
-        <form action="index.php" method="post" id="guestlogin">
+        <form action="index.php?standard=<?php echo $standard;?>" method="post" id="guestlogin">
           <div class="guestform">
             <input type="hidden" name="username" value="guest" />
             <input type="hidden" name="password" value="guest" />

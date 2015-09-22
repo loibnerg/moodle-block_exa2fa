@@ -41,15 +41,17 @@ if ($cancel) {
     redirect(new moodle_url('/'));
 }
 
+
+$standard = optional_param('standard', 0, PARAM_INT);
+
 //HTTPS is required in this page when $CFG->loginhttps enabled
 $PAGE->https_required();
 
 $context = context_system::instance();
-$PAGE->set_url("$CFG->httpswwwroot/auth/a2fa/login.php");
+$PAGE->set_url("$CFG->httpswwwroot/auth/a2fa/login.php?standard=".$standard);
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('login');
 
-$standard = optional_param('standard', 0, PARAM_INT);
 
 /// Initialize variables
 $errormsg = '';
@@ -230,7 +232,7 @@ if ($frm and isset($frm->username)) {                             // Login WITH 
 
         // test the session actually works by redirecting to self
         $SESSION->wantsurl = $urltogo;
-        redirect(new moodle_url(get_login_url(), array('testsession'=>$USER->id)));
+        redirect(new moodle_url(get_login_url(), array('testsession'=>$USER->id, 'standard'=>$standard)));
 
     } else {
         if (empty($errormsg)) {
@@ -254,7 +256,7 @@ if (empty($SESSION->wantsurl)) {
                           $_SERVER["HTTP_REFERER"] != $CFG->wwwroot.'/' &&
                           $_SERVER["HTTP_REFERER"] != $CFG->httpswwwroot.'/auth/' &&
                           strpos($_SERVER["HTTP_REFERER"], $CFG->httpswwwroot.'/auth/?') !== 0 &&
-                          strpos($_SERVER["HTTP_REFERER"], $CFG->httpswwwroot.'/auth/a2fa/login.php') !== 0) // There might be some extra params such as ?lang=.
+                          strpos($_SERVER["HTTP_REFERER"], $CFG->httpswwwroot.'/auth/a2fa/login.php?standard'.$standard) !== 0) // There might be some extra params such as ?lang=.
         ? $_SERVER["HTTP_REFERER"] : NULL;
 }
 
@@ -332,7 +334,7 @@ if (!empty($SESSION->loginerrormsg)) {
     if ($errormsg) {
         $SESSION->loginerrormsg = $errormsg;
     }
-    redirect(new moodle_url('/auth/a2fa/login.php'));
+    redirect(new moodle_url('/auth/a2fa/login.php?standard='.$standard));
 }
 
 $PAGE->set_title("$site->fullname: $loginsite");
@@ -344,7 +346,7 @@ if (isloggedin() and !isguestuser()) {
     // prevent logging when already logged in, we do not want them to relogin by accident because sesskey would be changed
     echo $OUTPUT->box_start();
     $logout = new single_button(new moodle_url($CFG->httpswwwroot.'/login/logout.php', array('sesskey'=>sesskey(),'loginpage'=>1)), get_string('logout'), 'post');
-    $continue = new single_button(new moodle_url($CFG->httpswwwroot.'/auth/a2fa/login.php', array('cancel'=>1)), get_string('cancel'), 'get');
+    $continue = new single_button(new moodle_url($CFG->httpswwwroot.'/auth/a2fa/login.php?standard='.$standard, array('cancel'=>1)), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
 } else {
