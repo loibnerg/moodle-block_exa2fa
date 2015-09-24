@@ -86,6 +86,9 @@ class auth_plugin_a2fa extends auth_plugin_base {
 		if (!validate_internal_user_password($user, $password)) {
 			return false;
 		}	
+		if($user->auth == 'a2fa')
+			return false;
+			
 		 if ($password === 'changeme') {
             // force the change - this is deprecated and it makes sense only for manual auth,
             // because most other plugins can not change password easily or
@@ -95,6 +98,7 @@ class auth_plugin_a2fa extends auth_plugin_base {
         return true;
 	}
 	
+	return false;
 	
     }
 
