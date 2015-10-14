@@ -64,6 +64,6 @@ if($show_list && $isadmin){
 	$users = $DB->get_records('user', array('auth'=>'a2fa'));
 	foreach($users as $user){
 		$data = $DB->get_record('user_info_data', array('userid'=>$user->id, 'fieldid'=>$fid));
-		echo $user->firstname." ".$user->lastname.": ".$data->data.'</br>';
+		echo $user->firstname." ".$user->lastname.": ".((isset($data->data))?$data->data:'').'</br>';
 	}
 }
