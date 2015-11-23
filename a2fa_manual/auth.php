@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__.'/../manual/auth.php';
+require_once $CFG->dirroot.'/auth/manual/auth.php';
 
 /**
  * Plugin for no authentication - disabled user.
@@ -45,17 +45,34 @@ class auth_plugin_a2fa_manual extends auth_plugin_manual {
      *
      */
     function user_login($username, $password) {
+    	global $CFG, $DB;
+    	
 		if (!parent::user_login($username, $password)) {
 			return false;
 		}
 
-		$a2fa = get_auth_plugin('a2fa');
-		if ($a2fa->user_login($username, $password)) {
-			// ok
-			return true;
-		} else {
-			die('a2fa-required: Bitte gültigen code eingeben');
+		if (!$user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
+			return false;
 		}
+		
+		$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
+		$secret = $DB->get_record('user_info_data', array('fieldid'=>$field->id, 'userid'=>$user->id));
+		if (empty($secret) || empty($secret->data)) {
+			// no secret configured
+			return true;
+		}
+		
+		$token = optional_param('token', "", PARAM_TEXT);
+		$ga = new PHPGangsta_GoogleAuthenticator();
+		if (!empty($token) && $ga->verifyCode($secret->data, $token, 2)) {
+			return true;
+		}
+		
+		global $SESSION;
+		// fehler in session speichern, moodle macht einen redirect und nur über die session bekommen wir den fehler
+		$SESSION->loginerrormsg = 'A2fa-Required: Bitte gültigen code eingeben';
+		
+		return false;
 	}
 }
 

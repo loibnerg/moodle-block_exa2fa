@@ -30,31 +30,34 @@ $(function(){
 
 		// remove old errors
 		$('.loginerrors').remove();
+		$('input').attr('disabled', 'disabled');
 		
 		login().always(function(content, ret, xhr){
-			var $content = content[0] == '<' ? $(content) : $('');
-			var $error = $content.find('.loginerrors');
+			var $error = $($.parseHTML(content)).find('.loginerrors');
 			var matches;
 			
-			
-			if ($error.length) {
-				$error.insertBefore($form);
-
-				$('#username-password').show();
-				$('#a2fa-token-form').hide();
-
-				$form.find('input[name=password]').val('');
-				$form.find('input[name=token]').val('');
-			} else if (matches = content.match(/a2fa-required(:\s*([^\s].*))?/)) {
+			window.xhr = xhr;
+			if (matches = content.match(/A2fa-Required(:\s*([^\s<>][^<>]+))?/i)) {
 				var errorText = matches[2];
 
 				// a2fa error
 				$('#username-password').hide();
 				$('#a2fa-token-form').show();
+				$('input').attr('disabled', null);
 
 				$form.find('input[name=token]').val('');
 				
 				$form.before('<div class="loginerrors"><span class="error">'+errorText+'</span></div>');
+			} else if ($error.length) {
+				$error.insertBefore($form);
+
+				$('#username-password').show();
+				$('#a2fa-token-form').hide();
+				$('input').attr('disabled', null);
+
+				$form.find('input[name=password]').val('');
+				$form.find('input[name=token]').val('');
+
 			} else {
 				// success
 				window.setTimeout(function(){
