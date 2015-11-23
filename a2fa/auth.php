@@ -54,7 +54,7 @@ class auth_plugin_a2fa extends auth_plugin_base {
 	if(!empty($token)){
 		if ($user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
 			$valid_login = validate_internal_user_password($user, $password);
-			if($valid_login && $user->auth == 'a2fa' && !empty($token)){
+			if($valid_login && preg_match('!^a2fa!', $user->auth) && !empty($token)){
 				$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
 				$fid = $field->id;
 				$uid = $user->id;
@@ -86,7 +86,7 @@ class auth_plugin_a2fa extends auth_plugin_base {
 		if (!validate_internal_user_password($user, $password)) {
 			return false;
 		}	
-		if($user->auth == 'a2fa')
+		if(preg_match('!^a2fa!', $user->auth))
 			return false;
 			
 		 if ($password === 'changeme') {

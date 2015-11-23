@@ -1,4 +1,40 @@
 <?php
+require __DIR__.'/../../../config.php';
+
+$CFG->alternateloginurl = null;
+
+$PAGE->requires->jquery();
+$PAGE->requires->js('/auth/a2fa/javascript/login.js', true);
+
+/*
+ob_start(function($output){
+	$output = preg_replace('![^"\']/login/index.php+!', 'asdf');
+	return $output;
+});
+*/
+
+require __DIR__.'/../../../login/index.php';
+
+// require 'index.php';
+exit;
+
+$PAGE->set_title("$site->fullname: $loginsite");
+$PAGE->set_heading("$site->fullname");
+
+$PAGE->requires->jquery();
+echo $OUTPUT->header();
+
+if (isloggedin() and !isguestuser()) {
+    // prevent logging when already logged in, we do not want them to relogin by accident because sesskey would be changed
+    echo $OUTPUT->box_start();
+    $logout = new single_button(new moodle_url($CFG->httpswwwroot.'/login/logout.php', array('sesskey'=>sesskey(),'loginpage'=>1)), get_string('logout'), 'post');
+    $continue = new single_button(new moodle_url($CFG->httpswwwroot.'/auth/a2fa/login.php?standard='.$standard, array('cancel'=>1)), get_string('cancel'), 'get');
+    echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
+    echo $OUTPUT->box_end();
+} else {
+    
+?>
+<?php
 if ($show_instructions) {
 	$columns = 'twocolumns';
 } else {
@@ -167,3 +203,56 @@ $(function(){
 	</div>
 <?php } ?>
 </div>
+<?php
+    if ($errormsg) {
+        $PAGE->requires->js_init_call('M.util.focus_login_error', null, true);
+    } else if (!empty($CFG->loginpageautofocus)) {
+        //focus username or password
+        $PAGE->requires->js_init_call('M.util.focus_login_form', null, true);
+    }
+}
+
+echo $OUTPUT->footer();
+
+exit;
+if (@$_REQUEST['username']) {
+    echo "<pre>";
+    print_r($_REQUEST);
+    die('login ok');
+}
+
+echo 'random string: '.time();
+?>
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+$(function(){
+    var needsA2FA = null;
+    $('form').submit(function(e){
+        e.preventDefault();
+        window.setTimeout(function(){
+        
+            if (needsA2FA === null) {
+                needsA2FA = true;
+                $('#normal').hide();
+				$('#a2fa').show();
+            } else {
+                // $('form').remove();
+                // history.replaceState({success:true}, 'title', "/asdf"); 
+                // $('body').append('login erfolgreich');
+                window.setTimeout(function(){
+                    document.location.href = 'pw_test2.php?username=ok';
+                }, 1);
+            }
+        }, 1000);
+        return false;
+    });
+});
+</script>
+<form method="post" id="form">
+<div id="normal">
+user: <input type="text" name="username" /><br />
+password: <input type="password" name="password" />
+</div>
+<div id="a2fa" style="display: none;">a2fa: <input type="text" name="a2fa" /></div>
+<input type="submit" />
+</form>

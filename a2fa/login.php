@@ -320,6 +320,18 @@ foreach($authsequence as $authname) {
     $potentialidps = array_merge($potentialidps, $authplugin->loginpage_idp_list($SESSION->wantsurl));
 }
 
+if (optional_param('ajax', false, PARAM_BOOL)) {
+	if ($errormsg) {
+		die(json_encode(['error' => $errormsg]));
+	}
+	if (!empty($SESSION->loginerrormsg)) {
+		die(json_encode(['error' => $SESSION->loginerrormsg]));
+	}
+	if ($SESSION->loginerrormsg) {
+		die(json_encode(['error' => $SESSION->loginerrormsg]));
+	}
+}
+
 if (!empty($SESSION->loginerrormsg)) {
     // We had some errors before redirect, show them now.
     $errormsg = $SESSION->loginerrormsg;
@@ -340,6 +352,7 @@ if (!empty($SESSION->loginerrormsg)) {
 $PAGE->set_title("$site->fullname: $loginsite");
 $PAGE->set_heading("$site->fullname");
 
+$PAGE->requires->jquery();
 echo $OUTPUT->header();
 
 if (isloggedin() and !isguestuser()) {
@@ -350,6 +363,7 @@ if (isloggedin() and !isguestuser()) {
     echo $OUTPUT->confirm(get_string('alreadyloggedin', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
 } else {
+    
     include("index_form.html");
     if ($errormsg) {
         $PAGE->requires->js_init_call('M.util.focus_login_error', null, true);
