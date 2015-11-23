@@ -33,11 +33,21 @@ $(function(){
 		$('input').attr('disabled', 'disabled');
 		
 		login().always(function(content, ret, xhr){
-			var $error = $($.parseHTML(content)).find('.loginerrors');
+			if (typeof content === "object") {
+				// error returns xhr as content
+				content = content.responseText;
+			}
+			var $error = $($.parseHTML(content)).find('.loginerrors, .errorbox');
 			var matches;
 			
+			// for testing
+			/*
+			window.content = content;
 			window.xhr = xhr;
-			if (matches = content.match(/A2fa-Required(:\s*([^\s<>][^<>]+))?/i)) {
+			window.ret = ret;
+			*/
+			
+			if (content && (matches = content.match(/A2fa-Required(:\s*([^\s<>][^<>]+))?/i))) {
 				var errorText = matches[2];
 
 				// a2fa error
@@ -57,7 +67,6 @@ $(function(){
 
 				$form.find('input[name=password]').val('');
 				$form.find('input[name=token]').val('');
-
 			} else {
 				// success
 				window.setTimeout(function(){

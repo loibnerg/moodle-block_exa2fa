@@ -15,30 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * a2fa_manual authentication login
+ * a2fa_ldap authentication login
  *
- * @package auth_a2fa_manual
+ * @package auth_a2fa_ldap
  * @author Petr Skoda
  * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot.'/auth/manual/auth.php';
+require_once $CFG->dirroot.'/auth/ldap/auth.php';
 require_once $CFG->dirroot.'/auth/a2fa/auth.php';
 
 /**
  * Plugin for no authentication - disabled user.
  */
-class auth_plugin_a2fa_manual extends auth_plugin_manual {
+class auth_plugin_a2fa_ldap extends auth_plugin_ldap {
 
 
     /**
      * Constructor.
      */
-    function auth_plugin_a2fa_manual() {
-    	parent::auth_plugin_manual();
-        $this->authtype = 'a2fa_manual';
+    function auth_plugin_a2fa_ldap() {
+        $this->init_plugin('ldap');
+        $this->authtype = 'a2fa_ldap';
     }
 
     /**
