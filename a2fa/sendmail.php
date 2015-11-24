@@ -52,16 +52,16 @@ if(is_siteadmin($USER)){
 
 	//send mail
 	$eventdata = new stdClass();
-	$eventdata->component         = 'auth_a2fa'; //your component name
-	$eventdata->name              = 'qrcode'; //this is the message name from messages.php
-	$eventdata->userfrom          = $USER;
-	$eventdata->userto            = $userreceiver;
-	$eventdata->subject           = "QR Code für Authentifizierung";
-	$eventdata->fullmessage       = "";
+	$eventdata->component		 = 'auth_a2fa'; //your component name
+	$eventdata->name			  = 'qrcode'; //this is the message name from messages.php
+	$eventdata->userfrom		  = $USER;
+	$eventdata->userto			= $userreceiver;
+	$eventdata->subject		   = "QR Code für Authentifizierung";
+	$eventdata->fullmessage	   = "";
 	$eventdata->fullmessageformat = FORMAT_MARKDOWN;
 	$eventdata->fullmessagehtml   = $message_content;
-	$eventdata->smallmessage      = '';
-	$eventdata->notification      = 1; //this is only set to 0 for personal messages between users
+	$eventdata->smallmessage	  = '';
+	$eventdata->notification	  = 1; //this is only set to 0 for personal messages between users
 	if($message_output->send_message($eventdata)){
 		?><script>
 			window.close();

@@ -17,15 +17,15 @@
 /**
  * Version information
  *
- * @package    auth_a2fa
+ * @package	auth_a2fa
  * @copyright  2011 Petr Skoda (http://skodak.org)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014110500;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version
-$plugin->component = 'auth_a2fa';       // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2014110500;		// The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014050800;		// Requires this Moodle version
+$plugin->component = 'auth_a2fa';	   // Full name of the plugin (used for diagnostics)
 $plugin->release = 'v1.0';
 $plugin->dependencies = array('profilefield_afaqr' => ANY_VERSION);

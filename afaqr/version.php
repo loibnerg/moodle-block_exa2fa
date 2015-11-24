@@ -17,14 +17,14 @@
 /**
  * QR code profile field version information.
  *
- * @package    profilefield_afaqr
+ * @package	profilefield_afaqr
  * @copyright  2014 Sam Battat
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014110500;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014050800;        // Requires this Moodle version
+$plugin->version   = 2014110500;		// The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014050800;		// Requires this Moodle version
 $plugin->component = 'profilefield_afaqr'; // Full name of the plugin (used for diagnostics)
 $plugin->release = 'v1.0';

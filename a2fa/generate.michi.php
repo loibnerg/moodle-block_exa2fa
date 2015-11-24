@@ -38,7 +38,7 @@ if($show_list==0){
 	
 	$ga = new PHPGangsta_GoogleAuthenticator();
 	$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
-        $fid = $field->id;
+		$fid = $field->id;
 
 	do{
 		$secret = $ga->createSecret();
@@ -47,17 +47,17 @@ if($show_list==0){
 		
 		//send mail
 		/*$eventdata = new stdClass();
-		$eventdata->component         = 'auth_a2fa'; //your component name
-		$eventdata->name              = 'qrcode'; //this is the message name from messages.php
-		$eventdata->userfrom          = $USER;
-		$eventdata->userto            = $userreceiver;
-		$eventdata->subject           = "QR Code für Authentifizierung Test";
-		$eventdata->fullmessage       = "";
+		$eventdata->component		 = 'auth_a2fa'; //your component name
+		$eventdata->name			  = 'qrcode'; //this is the message name from messages.php
+		$eventdata->userfrom		  = $USER;
+		$eventdata->userto			= $userreceiver;
+		$eventdata->subject		   = "QR Code für Authentifizierung Test";
+		$eventdata->fullmessage	   = "";
 		$eventdata->fullmessageformat = FORMAT_MARKDOWN;
 		$eventdata->fullmessagehtml   = "Scannen Sie folgenden QR Code mit der Google Authenticator App um einen Token für die Moodle-Anmeldung 
 			generieren zu können: </br>".$img;
-		$eventdata->smallmessage      = '';
-		$eventdata->notification      = 1; //this is only set to 0 for personal messages between users
+		$eventdata->smallmessage	  = '';
+		$eventdata->notification	  = 1; //this is only set to 0 for personal messages between users
 		$message_output->send_message($eventdata);*/
 	} while(!empty($row));
 
@@ -70,7 +70,7 @@ if($show_list && $isadmin){
 	$ga = new PHPGangsta_GoogleAuthenticator();
 	
 	$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
-        $fid = $field->id;
+		$fid = $field->id;
 
 	$data_records = $DB->get_records('user_info_data', array('fieldid'=>$fid));
 	foreach($data_records as $record){

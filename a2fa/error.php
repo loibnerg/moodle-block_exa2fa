@@ -18,9 +18,9 @@
 /**
  * Main login page.
  *
- * @package    a2fa
+ * @package	a2fa
  * @copyright  2014 Sam Battat
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require('../../config.php');

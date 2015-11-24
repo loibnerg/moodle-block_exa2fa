@@ -17,26 +17,26 @@
 /**
  * QR Code profile field definition.
  *
- * @package    profilefield_afaqr
+ * @package	profilefield_afaqr
  * @copyright  Sam Battat
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * Class profile_define_afaqr
  *
  * @copyright  2014 Sam Battat
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class profile_define_afaqr extends profile_define_base {
 
-    /**
-     * Add elements for creating/editing a QR code profile field.
-     * @param moodleform $form
-     */
-    public function define_form_specific($form) {
+	/**
+	 * Add elements for creating/editing a QR code profile field.
+	 * @param moodleform $form
+	 */
+	public function define_form_specific($form) {
 	// Default data.
-        $form->addElement('text', 'defaultdata', get_string('profiledefaultdata', 'admin'), 'size="50"');
-        $form->setType('defaultdata', PARAM_TEXT);
-    }
+		$form->addElement('text', 'defaultdata', get_string('profiledefaultdata', 'admin'), 'size="50"');
+		$form->setType('defaultdata', PARAM_TEXT);
+	}
 }
