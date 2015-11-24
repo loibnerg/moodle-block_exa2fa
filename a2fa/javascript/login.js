@@ -1,4 +1,5 @@
 $(function(){
+	// add a2fa to form
 	$('.loginform').wrapInner('<div id="username-password"></div>');
 	$('.loginform').append(
 		'<div id="a2fa-token-form" style="display: none;">' +
@@ -15,16 +16,27 @@ $(function(){
 	
 	function login() {
 		// Send the data using post
-		return $.post($form.attr('action'), {
-			ajax: true,
-			username: $form.find('input[name=username]').val(),
-			password: $form.find('input[name=password]').val(),
-			token: $form.find('input[name=token]').val(),
-			rememberusername: $form.find('input[name=rememberusername]:checked').val(),
+		return $.ajax({
+			dataType: "json",
+			url: $form.attr('action'),
+			dataType: 'json',
+			method: 'post',
+			data: {
+				ajax: true,
+				username: $form.find('input[name=username]').val(),
+				password: $form.find('input[name=password]').val(),
+				token: $form.find('input[name=token]').val(),
+				rememberusername: $form.find('input[name=rememberusername]:checked').val(),
+			}
 		});
 	}
 	
-	$('form#login').submit(function(event){
+	function error(errorText) {
+		$('.loginerrors').remove();
+		$form.before('<div class="loginerrors"><span class="error">'+errorText+'</span></div>');
+	}
+	
+	$form.submit(function(event){
 		// Stop form from submitting normally
 		event.preventDefault();
 
@@ -32,48 +44,36 @@ $(function(){
 		$('.loginerrors').remove();
 		$('input').attr('disabled', 'disabled');
 		
-		login().always(function(content, ret, xhr){
-			if (typeof content === "object") {
-				// error returns xhr as content
-				content = content.responseText;
-			}
-			var $error = $($.parseHTML(content)).find('.loginerrors, .errorbox');
-			var matches;
-			
+		login().done(function(data, ret, xhr){
 			// for testing
 			/*
 			window.content = content;
 			window.xhr = xhr;
 			window.ret = ret;
+			return;
 			*/
 			
-			if (content && (matches = content.match(/A2fa-Required(:\s*([^\s<>][^<>]+))?/i))) {
-				var errorText = matches[2];
+			if (data['a2fa-error']) {
+				error(data['a2fa-error']);
 
 				// a2fa error
 				$('#username-password').hide();
 				$('#a2fa-token-form').show();
 				$('input').attr('disabled', null);
+				$('input[name=token]').focus();
 
 				$form.find('input[name=token]').val('');
-				
-				$form.before('<div class="loginerrors"><span class="error">'+errorText+'</span></div>');
-			} else if ($error.length) {
-				$error.insertBefore($form);
-
-				$('#username-password').show();
-				$('#a2fa-token-form').hide();
-				$('input').attr('disabled', null);
-
-				$form.find('input[name=password]').val('');
-				$form.find('input[name=token]').val('');
-			} else {
-				// success
+			} else if (data.url) {
+				// we got an url -> redirect
 				window.setTimeout(function(){
-					document.location.href = M.cfg.wwwroot;
+					document.location.href = data.url;
 				}, 1);
+			} else {
+				// could check data.error here, but not needed, because moodle shows error after reload
+				location.reload(true);
 			}
-			
+		}).fail(function(){
+			error('Unknown Error');
 		});
 	});
 });
