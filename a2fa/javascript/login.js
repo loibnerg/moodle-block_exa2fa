@@ -12,7 +12,7 @@ $(function(){
 	);
 
 	var $form = $('form#login');
-	$form.attr('action', M.cfg.wwwroot+'/auth/a2fa/login/');
+	$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/login/');
 	
 	function login() {
 		// Send the data using post
@@ -43,7 +43,6 @@ $(function(){
 		// remove old errors
 		$('.loginerrors').remove();
 		$('input').attr('disabled', 'disabled');
-		
 		login().done(function(data, ret, xhr){
 			// for testing
 			/*

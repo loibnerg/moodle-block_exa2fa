@@ -1,15 +1,19 @@
 <?php
 require __DIR__.'/../../../config.php';
 
+// avoid redirect to login form after login
+if (isloggedin() and !isguestuser()) {
+	redirect($CFG->wwwroot);
+}
+
 $CFG->alternateloginurl = null;
 
-// avoid redirect to login form after login
 if (preg_match('!/login/!', $SESSION->wantsurl )) {
 	$SESSION->wantsurl = null;
 }
 
 $PAGE->requires->jquery();
-$PAGE->requires->js('/auth/a2fa/javascript/login.js', true);
+$PAGE->requires->js('/blocks/exa2fa/javascript/login.js', true);
 
 if (optional_param('ajax', false, PARAM_BOOL)) {
 	ob_start(function($output){
@@ -27,7 +31,7 @@ if (optional_param('ajax', false, PARAM_BOOL)) {
 		// moodle returns 303 redirect, we return 200 ok
 		header('HTTP/1.1 200 OK');
 		
-		return json_encode(['error'=>$errormsg, 'a2fa-error' => !empty($A2FA_ERROR) ? $A2FA_ERROR : null, 'url'=>$location]);
+		return json_encode(['error'=>$errormsg, 'a2fa-error' => !empty($A2FA_ERROR) ? $A2FA_ERROR : null, 'url'=>$location, 'original-output' => $output]);
 	});
 }
 

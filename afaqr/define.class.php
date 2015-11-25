@@ -35,7 +35,7 @@ class profile_define_afaqr extends profile_define_base {
 	 * @param moodleform $form
 	 */
 	public function define_form_specific($form) {
-	// Default data.
+		// Default data.
 		$form->addElement('text', 'defaultdata', get_string('profiledefaultdata', 'admin'), 'size="50"');
 		$form->setType('defaultdata', PARAM_TEXT);
 	}

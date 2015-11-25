@@ -38,7 +38,7 @@ Once the A2FA is activated for a user, the default login page does not allow the
 
 The default login page for this plugin is:
 
-yourmoodlesite.com/auth/a2fa/login.php
+yourmoodlesite.com/blocks/exa2fa/login/
 
 
 You could make this login page the default for all users but if a user does not have the A2FA set up or enabled they will not be able to login. So rather, just have your A2FA user go to the above url to login.

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,17 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Main login page.
+ * Strings for component 'auth_a2fa', language 'en'.
  *
- * @package	a2fa
- * @copyright  2014 Sam Battat
- * @license	http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   auth_a2fa
+ * @copyright Sam Battat
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../../config.php');
-
-$PAGE->set_context(context_system::instance());
-
-echo $OUTPUT->header();
-echo get_string('loginerror', 'auth_a2fa');
-echo $OUTPUT->footer();
+$string['auth_exa2fadescription'] = 'Users can login with 2 factor authentication using Google Authenticator app';
+$string['pluginname'] = 'A2FA (Another 2-Factor Auth)';
+$string['loginerror'] = 'There was a problem with 2 factor authentication login, please check with the site administrator.';

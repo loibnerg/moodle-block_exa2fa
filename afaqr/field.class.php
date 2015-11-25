@@ -36,6 +36,8 @@ class profile_field_afaqr extends profile_field_base {
 	public function display_data() {
 		global $DB, $USER;
 		
+		return 'x';
+		
 		// Default formatting.
 		$data = parent::display_data();
 		$current_user = $DB->get_record('user', array('id'=>$this->userid)); 
@@ -69,6 +71,9 @@ class profile_field_afaqr extends profile_field_base {
 	 * @param moodleform $mform
 	 */
 	public function edit_field_add($mform) {
+		// deactivated, not neede anymore
+		// return;
+		
 	global $CFG, $PAGE, $DB;
 	$PAGE->requires->jquery();
 	$PAGE->requires->js('/user/profile/field/afaqr/js/newsecret.js');
