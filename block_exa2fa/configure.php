@@ -42,4 +42,4 @@ if ($action == 'generate') {
 	redirect($returnurl);
 }
 
-die('error');
+print_error('unknown action');

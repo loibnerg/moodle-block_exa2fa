@@ -14,6 +14,7 @@ if (preg_match('!/login/!', $SESSION->wantsurl )) {
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/exa2fa/javascript/login.js', true);
+$PAGE->requires->strings_for_js(['sessionerroruser'], 'error');
 
 if (optional_param('ajax', false, PARAM_BOOL)) {
 	ob_start(function($output){

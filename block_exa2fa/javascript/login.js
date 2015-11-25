@@ -75,4 +75,9 @@ $(function(){
 			error('Unknown Error');
 		});
 	});
+	
+	// show error on page load, if non present
+	if (!$('.loginerrors').length && document.location.href.match(/[&?]errorcode=4(&|$)/)) {
+		error(M.util.get_string('sessionerroruser', 'error'));
+	}
 });

@@ -26,8 +26,22 @@ function user_can_a2fa() {
 	global $USER;
 
 	return $USER->id && !empty($USER->auth) && /* guest user has no auth set */
-		(in_array($USER->auth, ['manual', 'ldap', 'email']) /* is standard login */
-		|| preg_replace('!^a2fa_!', '', $USER->auth)); /* is a2fa login */
+		(in_array($USER->auth, get_enabled_plugins_with_a2fa_available()) /* is standard login */
+		|| preg_match('!^a2fa_!', $USER->auth)); /* is a2fa login */
+}
+
+function get_enabled_plugins_with_a2fa_available() {
+	$enabledPlugins = \core_plugin_manager::instance()->get_enabled_plugins('auth');
+	$a2faPlugins = [];
+	
+	foreach (['manual', 'ldap', 'email'] as $plugin) {
+		if (in_array($plugin, $enabledPlugins) && in_array('a2fa_'.$plugin, $enabledPlugins)) {
+			// normal and a2fa plugin available
+			$a2faPlugins[$plugin] = $plugin;
+		}
+	}
+	
+	return $a2faPlugins;
 }
 
 function user_activate() {
