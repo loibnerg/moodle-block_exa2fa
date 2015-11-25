@@ -21,15 +21,25 @@
 * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 require_once('../../config.php');
-require_once('GoogleAuthenticator.php');
+require_once __DIR__.'/lib/lib.php';
 
-$ga = new PHPGangsta_GoogleAuthenticator();
-$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
-	$fid = $field->id;
+$action = required_param('action', PARAM_ALPHANUMEXT);
+$returnurl = required_param('returnurl', PARAM_LOCALURL);
 
-do{
-	$secret = $ga->createSecret();
-	$row = $DB->get_records_select('user_info_data', "fieldid = {$fid} AND ".$DB->sql_compare_text('data')." = '$secret'");
-} while(!empty($row));
+if ($action == 'activate') {
+	\block_exa2fa\user_activate();
+	
+	redirect($returnurl);
+}
+if ($action == 'deactivate') {
+	\block_exa2fa\user_deactivate();
 
-echo json_encode(array('status' => 'success', 'secret' => $secret));
+	redirect($returnurl);
+}
+if ($action == 'generate') {
+	\block_exa2fa\user_generate_secret();
+	
+	redirect($returnurl);
+}
+
+die('error');

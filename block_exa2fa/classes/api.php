@@ -15,25 +15,14 @@ class api {
 			return true;
 		}
 		
-		// test
-		if (optional_param('token', "", PARAM_TEXT) == '1234') {
-			return true;
-		} else {
-			global $A2FA_ERROR;
-			$A2FA_ERROR = 'pwd: 1234';
-			return false;
-		}
-		
-		$field = $DB->get_record('user_info_field', array('shortname'=>'a2fasecret'));
-		$secret = $DB->get_record('user_info_data', array('fieldid'=>$field->id, 'userid'=>$user->id));
-		if (empty($secret) || empty($secret->data)) {
+		if (!$data = \block_exa2fa\user_is_a2fa_active($user->id)) {
 			// no secret configured -> a2fa check not needed
 			return true;
 		}
 		
 		$token = optional_param('token', "", PARAM_TEXT);
-		$ga = new PHPGangsta_GoogleAuthenticator();
-		if (!empty($token) && $ga->verifyCode($secret->data, $token, 2)) {
+		$ga = new \PHPGangsta_GoogleAuthenticator();
+		if (!empty($token) && $ga->verifyCode($data->secret, $token, 2)) {
 			// login ok
 			return true;
 		}

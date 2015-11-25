@@ -24,4 +24,3 @@
 
 $string['auth_exa2fadescription'] = 'Users can login with 2 factor authentication using Google Authenticator app';
 $string['pluginname'] = 'A2FA (Another 2-Factor Auth)';
-$string['loginerror'] = 'There was a problem with 2 factor authentication login, please check with the site administrator.';
