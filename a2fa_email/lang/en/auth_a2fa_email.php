@@ -22,5 +22,5 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['auth_a2fa_ldapdescription'] = 'A2FA: LDAP';
-$string['pluginname'] = 'A2FA: LDAP';
+$string['auth_a2fa_emaildescription'] = 'A2FA: Email';
+$string['pluginname'] = 'A2FA: Email';

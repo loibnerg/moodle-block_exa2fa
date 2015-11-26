@@ -15,7 +15,7 @@ class api {
 			return true;
 		}
 		
-		if (!$data = \block_exa2fa\user_is_a2fa_active($user->id)) {
+		if (!$data = \block_exa2fa\user_setting::get($user)->is_a2fa_active()) {
 			// no secret configured -> a2fa check not needed
 			return true;
 		}

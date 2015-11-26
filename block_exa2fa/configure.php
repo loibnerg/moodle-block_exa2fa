@@ -24,22 +24,29 @@ require_once('../../config.php');
 require_once __DIR__.'/lib/lib.php';
 
 $action = required_param('action', PARAM_ALPHANUMEXT);
-$returnurl = required_param('returnurl', PARAM_LOCALURL);
+$returnurl = new moodle_url(required_param('returnurl', PARAM_LOCALURL));
+$userid = optional_param('userid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
+
+require_login($courseid);
+
+if (!$userid || $userid == $USER->id) {
+	$userid = $USER->id;
+} elseif (($action == 'deactivate') && \block_exa2fa\teacher_can_deactivate_student($COURSE->id, $userid)) {
+	// teacher can only deactivate
+} else {
+	print_error('no permissions');
+}
 
 if ($action == 'activate') {
-	\block_exa2fa\user_activate();
-	
-	redirect($returnurl);
-}
-if ($action == 'deactivate') {
-	\block_exa2fa\user_deactivate();
-
-	redirect($returnurl);
-}
-if ($action == 'generate') {
-	\block_exa2fa\user_generate_secret();
-	
-	redirect($returnurl);
+	\block_exa2fa\user_setting::get($userid)->activate();
+} elseif ($action == 'deactivate') {
+	\block_exa2fa\user_setting::get($userid)->deactivate();
+} elseif ($action == 'generate') {
+	\block_exa2fa\user_setting::get($userid)->generate_secret();
+} else {
+	print_error('unknown action');
 }
 
-print_error('unknown action');
+redirect($returnurl);
+
