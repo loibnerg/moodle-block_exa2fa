@@ -18,11 +18,9 @@ class user_setting {
 	 * @return \block_exa2fa\user_setting
 	 */
 	static function get($userid) {
-		if (is_object($userid)) {
-			$user = $userid;
-		} else {
-			$user = g::$DB->get_record('user', ['id' => $userid]);
-		}
+		// always load current user from database
+		// because $USER caches the user settings
+		$user = g::$DB->get_record('user', ['id' => is_object($userid) ? $userid->id : $userid]);
 		
 		if (!$user) {
 			return null;
@@ -47,8 +45,8 @@ class user_setting {
 		
 		if ($data = $this->is_a2fa_active()) {
 			// Default formatting.
-			$urlencoded = urlencode('otpauth://totp/'.str_replace(' ','-',g::$SITE->fullname.'-'.fullname($this->user)).'?secret='.$data->secret.'');
-			$src = 'https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl='.$urlencoded.'';
+			$ga = new \PHPGangsta_GoogleAuthenticator();
+			$src = $ga->getQRCodeGoogleUrl(g::$SITE->fullname.' / '.fullname($this->user), $data->secret);
 		
 			$img =  '<img src="'.$src.'"/>';
 				

@@ -11,7 +11,9 @@ require_once __DIR__.'/lib/lib.php';
  * @param unknown $course
  */
 function block_exa2fa_myprofile_navigation($tree, $user, $iscurrentuser, $course) {
-	$a2faSettings = \block_exa2fa\user_setting::get($user);
+	if (!$a2faSettings = \block_exa2fa\user_setting::get($user)) {
+		return;
+	}
 	
 	$content = '';
 	if ($iscurrentuser) {
