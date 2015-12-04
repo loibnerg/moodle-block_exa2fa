@@ -19,7 +19,7 @@ Now go to ***Site Administration > Plugins > Authentication > Manage authenticat
 
 ##How to login: alternateloginurl
 
-you have to change the Alternate login URL in the moodle settings (Plugins/Authentication/Manage Authentications) to
+you have to change the Alternate login URL in the moodle settings (***Site Administration > Plugins > Authentication > Manage authentication***) to
 yourmoodlesite.com/blocks/exa2fa/login/
 else the a2fa users can't login.
 
