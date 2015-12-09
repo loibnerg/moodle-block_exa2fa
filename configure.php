@@ -38,15 +38,65 @@ if (!$userid || $userid == $USER->id) {
 	print_error('no permissions');
 }
 
-if ($action == 'activate') {
-	\block_exa2fa\user_setting::get($userid)->activate();
-} elseif ($action == 'deactivate') {
-	\block_exa2fa\user_setting::get($userid)->deactivate();
-} elseif ($action == 'generate') {
-	\block_exa2fa\user_setting::get($userid)->generate_secret();
+if ($action == 'deactivate') {
+	\block_exa2fa\user_setting::get($USER->id)->deactivate();
+	redirect($returnurl);
+} elseif ($action == 'activate' || $action == 'generate') {
+
+	$secret = optional_param('secret', '', PARAM_ALPHANUM);
+	$token = optional_param('token', '', PARAM_ALPHANUM);
+
+	$error = '';
+	if ($secret && $token) {
+		if (\block_exa2fa\user_setting::get($USER->id)->activate($secret, $token)) {
+			// ok
+			redirect($returnurl);
+		}
+
+		$error = 'Der eingegebene Code ist falsch';
+	}
+
+	if (!$secret) {
+		$secret = \block_exa2fa\generate_secret();
+	}
+
+	// Default formatting.
+	$ga = new \PHPGangsta_GoogleAuthenticator();
+	// don't allow any special characters in code name
+	$src = $ga->getQRCodeGoogleUrl(preg_replace('![^a-zA-Z0-9]+!', '-', $SITE->fullname.'-'.fullname($USER)), $secret);
+
+	$img = '<img src="'.$src.'" />';
+
+	$PAGE->set_url('/blocks/exa2fa/configure.php');
+	$PAGE->set_context(context_system::instance());
+
+	echo $OUTPUT->header();
+
+	echo '<div style="text-align: center;">Dein neuer a2fa Code lautet: '.$secret.'<br />';
+
+	echo '<br />Bitte scan den untenstehenden QR Code mit Google Auth ein und bestätige ...<br />';
+
+	echo $img;
+
+	if ($error) {
+		echo '<div class="alert alert-error">'.$error.'</div>';
+	}
+
+	?>
+		<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+			<input type="hidden" name="secret" value="<?php echo $secret; ?>" />
+			<input type="text" name="token" size="15" value="" />
+			<input type="submit" value="Bestätigen" />
+		</form>
+	<?php
+
+	echo '<br /><br />';
+	echo \html_writer::empty_tag('input', ['type'=>'button',
+			'value'=>\block_exa2fa\trans('zurück'),
+			'onclick'=>'document.location.href='.json_encode($returnurl->out(false))]);
+
+	echo $OUTPUT->footer();
 } else {
 	print_error('unknown action');
 }
-
-redirect($returnurl);
 

@@ -44,18 +44,9 @@ class user_setting {
 		$url = new \moodle_url('/blocks/exa2fa/configure.php', ['action'=>null, 'returnurl' => (new \moodle_url(g::$PAGE->url))->out_as_local_url(false)]);
 		
 		if ($data = $this->is_a2fa_active()) {
-			// Default formatting.
-			$ga = new \PHPGangsta_GoogleAuthenticator();
-			$src = $ga->getQRCodeGoogleUrl(rawurlencode(g::$SITE->fullname.' / '.fullname($this->user)), $data->secret);
-		
-			$img =  '<img src="'.$src.'"/>';
-				
-			$output  = '<div style="text-align: center;">Dein a2fa Code lautet: '.$data->secret.'<br />';
-			$output .= '<div style="padding: 5px;">';
-			$output .= $img;
-			$output .= '</div>';
+			$output  = '<div style="text-align: center;">A2fa ist aktiv.<br />';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
-							'value'=>\block_exa2fa\trans('Code neu generieren'),
+							'value'=>\block_exa2fa\trans('Neuen Code generieren'),
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'generate']))]);
 			$output .= '&nbsp;&nbsp;';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
@@ -69,9 +60,9 @@ class user_setting {
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'activate']))]);
 			$output .= '</div>';
 		}
-		
+
 		return $output;
-		
+
 	}
 	
 	function getTeacherOutput($courseid) {
@@ -105,24 +96,29 @@ class user_setting {
 		}
 	}
 
-	function activate() {
+	function activate($secret, $token) {
 		if (!$this->can_a2fa()) {
 			print_error('a2fa not allowed');
 		}
-		
-		\block_exa2fa\db::insert_or_update_record('block_exa2fauser', [
-			'a2faactive' => 1
-		], ['userid' => $this->user->id]);
-		
-		if (!$this->exa2fauser || !$this->exa2fauser->secret) {
-			// generate secret if not present
-			$this->generate_secret();
+
+		$ga = new \PHPGangsta_GoogleAuthenticator();
+		if (!$ga->verifyCode($secret, $token, 2)) {
+			return false;
 		}
+
+		$data = [
+			'a2faactive' => 1,
+			'secret' => $secret
+		];
+
+		\block_exa2fa\db::insert_or_update_record('block_exa2fauser', $data, ['userid' => $this->user->id]);
 		
 		g::$DB->update_record('user', [
 			'id' => $this->user->id,
 			'auth' => 'a2fa_'.preg_replace('!^a2fa_!', '', $this->user->auth)
 		]);
+
+		return true;
 	}
 	
 	function deactivate() {
@@ -135,18 +131,16 @@ class user_setting {
 			'auth' => preg_replace('!^a2fa_!', '', $this->user->auth)
 		]);
 	}
-	
-	function generate_secret() {
-		$ga = new \PHPGangsta_GoogleAuthenticator();
-		do{
-			$secret = $ga->createSecret();
-			$secretCheck = g::$DB->get_field_select('block_exa2fauser', 'secret', g::$DB->sql_compare_text('secret')." = ?", [$secret]);
-		} while($secretCheck);
-		
-		\block_exa2fa\db::update_record('block_exa2fauser', [
-			'secret' => $secret
-		], ['userid' => $this->user->id]);
-	}
+}
+
+function generate_secret() {
+	$ga = new \PHPGangsta_GoogleAuthenticator();
+	do{
+		$secret = $ga->createSecret();
+		$secretCheck = g::$DB->get_field_select('block_exa2fauser', 'secret', g::$DB->sql_compare_text('secret')." = ?", [$secret]);
+	} while($secretCheck);
+
+	return $secret;
 }
 
 function get_enabled_plugins_with_a2fa_available() {
