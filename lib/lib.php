@@ -46,7 +46,7 @@ class user_setting {
 		if ($data = $this->is_a2fa_active()) {
 			// Default formatting.
 			$ga = new \PHPGangsta_GoogleAuthenticator();
-			$src = $ga->getQRCodeGoogleUrl(g::$SITE->fullname.' / '.fullname($this->user), $data->secret);
+			$src = $ga->getQRCodeGoogleUrl(rawurlencode(g::$SITE->fullname.' / '.fullname($this->user)), $data->secret);
 		
 			$img =  '<img src="'.$src.'"/>';
 				
