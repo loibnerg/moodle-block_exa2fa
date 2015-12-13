@@ -4,7 +4,7 @@ $(function(){
 	$('.loginform').append(
 		'<div id="a2fa-token-form" style="display: none;">' +
 		'	<div class="clearer"><!-- --></div>' +
-		'	<div class="form-label"><label for="token">Google Authenticator Code</label></div>' +
+		'	<div class="form-label"><label for="token">Authenticator Einmalpasswort</label></div>' +
 		'	<div class="form-input">' +
 		'		<input type="text" name="token" id="token" size="15" value="" />' +
 		'	</div>' +

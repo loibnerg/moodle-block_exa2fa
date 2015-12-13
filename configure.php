@@ -74,7 +74,7 @@ if ($action == 'deactivate') {
 
 	echo '<div style="text-align: center;">Dein neuer a2fa Code lautet: '.$secret.'<br />';
 
-	echo '<br />Bitte scan den untenstehenden QR Code mit Google Auth ein und bestätige ...<br />';
+	echo '<br />Bitte scan den untenstehenden QR Code mit der Auth App ein und bestätige mit dem generierten Einmalpasswort<br />';
 
 	echo $img;
 

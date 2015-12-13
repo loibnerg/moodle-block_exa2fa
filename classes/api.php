@@ -33,7 +33,7 @@ class api {
 			return true;
 		}
 		
-		$error = 'Bitte gültigen code eingeben';
+		$error = 'Bitte gültigen Code eingeben';
 		
 		// for login form, set the login error message
 		global $A2FA_ERROR;
@@ -47,8 +47,6 @@ class api {
 
 	static function user_update_password($user, $newpassword) {
 		global $USER;
-
-		var_dump($USER);
 
 		if (!empty($USER->username) && $USER->username == $user->username) {
 			// the user is already logged in
