@@ -8,8 +8,14 @@ require_once __DIR__.'/../lib/lib.php';
 
 class api {
 	static function user_login($username, $password) {
-		global $CFG, $DB;
+		global $CFG, $DB, $USER;
 		
+		if (!empty($USER->username) && $USER->username == $username) {
+			// the user is already logged in
+			// then this function is called for password change -> no a2fa needed here
+			return true;
+		}
+
 		if (!$user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
 			// no user yet -> no a2fa configured -> a2fa check not needed
 			return true;
@@ -37,5 +43,22 @@ class api {
 		header('X-A2fa-Required: '.htmlentities($error));
 		
 		return false;
+	}
+
+	static function user_update_password($user, $newpassword) {
+		global $USER;
+
+		var_dump($USER);
+
+		if (!empty($USER->username) && $USER->username == $user->username) {
+			// the user is already logged in
+			// then this function is called for normal password change
+		} else {
+			// the user is not logged in
+			// reset the session when changing password to log him out
+			\core\session\manager::terminate_current();
+		}
+
+		return true;
 	}
 }

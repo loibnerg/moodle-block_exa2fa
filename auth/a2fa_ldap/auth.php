@@ -38,5 +38,13 @@ class auth_plugin_a2fa_ldap extends auth_plugin_ldap {
 	function process_config($config) {
 		return true;
 	}
+
+	function user_update_password($user, $newpassword) {
+		if (!parent::user_update_password($user, $newpassword)) {
+			return false;
+		}
+
+		return \block_exa2fa\api::user_update_password($user, $newpassword);
+	}
 }
 
