@@ -22,5 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['auth_exa2fadescription'] = 'Users can login with 2 factor authentication using Google Authenticator app';
+$string['block_exa2fadescription'] = 'Users can login with 2 factor authentication using Google Authenticator app';
 $string['pluginname'] = 'A2FA (Another 2-Factor Auth)';
+
+$string['exa2fa:addinstance'] = 'Exa2fa auf Kursseite anlegen';
+$string['exa2fa:myaddinstance'] = 'Exa2fa auf Startseite anlegen';
