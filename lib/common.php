@@ -12,12 +12,54 @@ class url extends \moodle_url {
 	 * @return self
 	 */
 	public function copy(array $overrideparams = null) {
-		$class = get_class();
-		$object = new $class($this);
+		$object = new static($this);
 		if ($overrideparams) {
 			$object->params($overrideparams);
 		}
 		return $object;
+	}
+	
+	protected function merge_overrideparams(array $overrideparams = null) {
+		$params = parent::merge_overrideparams($overrideparams);
+
+		$overrideparams = (array)$overrideparams;
+		foreach ($overrideparams as $key => $value) {
+			if ($value === null) {
+				unset($params[$key]);
+			}
+		}
+		return $params;
+	}
+	
+	public function params(array $params = null) {
+		parent::params($params);
+
+		$params = (array)$params;
+		foreach ($params as $key => $value) {
+			if ($value === null) {
+				unset($this->params[$key]);
+			}
+		}
+		return $this->params;
+	}
+}
+
+abstract class event extends \core\event\base {
+	
+	protected static function prepareData(array &$data) {
+		if (!isset($data['contextid']) && isset($data['courseid'])) {
+			if ($data['courseid']) {
+				$data['contextid'] = \context_course::instance($data['courseid'])->id;
+			} else {
+				$data['contextid'] = \context_system::instance()->id;
+			}
+		}
+	}
+	
+	static function log(array $data) {
+		static::prepareData($data);
+		
+		return static::create($data)->trigger();
 	}
 }
 
@@ -38,8 +80,9 @@ class exception extends \moodle_exception {
 class SimpleXMLElement extends \SimpleXMLElement {
 	/**
 	 * Adds a child with $value inside CDATA
-	 * @param unknown $name
-	 * @param unknown $value
+	 * @param string $name
+	 * @param mixed $value
+	 * @return SimpleXMLElement
 	 */
 	public function addChildWithCDATA($name, $value = NULL) {
 		$new_child = $this->addChild($name);
@@ -54,7 +97,7 @@ class SimpleXMLElement extends \SimpleXMLElement {
 	}
 
 	public static function create($rootElement) {
-		return new self('<?xml version="1.0" encoding="UTF-8"?><'.$rootElement.' />');
+		return new static('<?xml version="1.0" encoding="UTF-8"?><'.$rootElement.' />');
 	}
 
 	public function addChildWithCDATAIfValue($name, $value = NULL) {
@@ -72,9 +115,9 @@ class SimpleXMLElement extends \SimpleXMLElement {
 			$newNode = $node->ownerDocument->importNode(dom_import_simplexml($newNode), true);
 			$node->appendChild($newNode);
 
-			// return last children, this is the added child!
+			// return last child, this is the added child!
 			$children = $this->children();
-			return $children[count($children)-1];
+			return $children[$children->count()-1];
 		} else {
 			return parent::addChild($name, $value, $namespace);
 		}
@@ -88,6 +131,12 @@ class SimpleXMLElement extends \SimpleXMLElement {
 }
 
 class db {
+	/**
+	 * @param $table
+	 * @param $data
+	 * @param $where
+	 * @return null|object
+	 */
 	public static function update_record($table, $data, $where) {
 		global $DB;
 
@@ -97,35 +146,46 @@ class db {
 		if ($dbItem = $DB->get_record($table, $where)) {
 			if ($data) {
 				$data['id'] = $dbItem->id;
-				$DB->update_record($table, $data);
+				$DB->update_record($table, (object)$data);
 			}
 
-			return (object)($data + $where);
+			return (object)($data + (array)$dbItem);
 		}
 
 		return null;
 	}
 
+	/**
+	 * @param $table
+	 * @param $data
+	 * @param null $where
+	 * @return object
+	 * @throws exception
+	 */
 	public static function insert_or_update_record($table, $data, $where = null) {
 		global $DB;
 
 		$data = (array)$data;
 
 		if ($dbItem = $DB->get_record($table, $where !== null ? $where : $data)) {
-			if ($data) {
-				$data['id'] = $dbItem->id;
-				$DB->update_record($table, $data);
+			if (empty($data)) {
+				throw new exception('$data is empty');
 			}
+
+			$data['id'] = $dbItem->id;
+			$DB->update_record($table, (object)$data);
+
+			return (object)($data + (array)$dbItem);
 		} else {
 			unset($data['id']);
 			if ($where !== null) {
 				$data = $data + $where; // first the values of $data, then of $where, but don't override $data
 			}
-			$id = $DB->insert_record($table, $data);
+			$id = $DB->insert_record($table, (object)$data);
 			$data['id'] = $id;
-		}
 
-		return (object)$data;
+			return (object)$data;
+		}
 	}
 }
 
@@ -150,10 +210,8 @@ class param {
 	}
 
 	public static function clean_array($values, $definition) {
+		$definition = (array)$definition;
 
-		if (count($definition) != 1) {
-			print_error('no array definition');
-		}
 		if (is_object($values)) {
 			$values = (array)$values;
 		} elseif (!is_array($values)) {
@@ -174,7 +232,7 @@ class param {
 
 		$ret = array();
 		foreach ($values as $key=>$value) {
-			$value = static::_clean($value, $valueType, true);
+			$value = static::_clean($value, $valueType);
 			if ($value === null) continue;
 			
 			if ($keyType == PARAM_SEQUENCE) {
@@ -208,7 +266,17 @@ class param {
 		}
 	}
 
-	public static function optional_array($parname, array $definition) {
+	public static function get_required_param($parname) {
+		$param = static::get_param($parname);
+
+		if ($param === null) {
+			throw new exception('param not found: '.$parname);
+		}
+
+		return $param;
+	}
+
+	public static function optional_array($parname, $definition) {
 		$param = static::get_param($parname);
 
 		if ($param === null) {
@@ -218,14 +286,10 @@ class param {
 		}
 	}
 
-	public static function required_array($parname, array $definition) {
-		$param = static::get_param($parname);
+	public static function required_array($parname, $definition) {
+		$param = static::get_required_param($parname);
 
-		if ($param === null) {
-			print_error('param not found: '.$parname);
-		} else {
-			return static::clean_array($param, $definition);
-		}
+		return static::clean_array($param, $definition);
 	}
 	
 	public static function optional_object($parname, $definition) {
@@ -239,13 +303,9 @@ class param {
 	}
 
 	public static function required_object($parname, $definition) {
-		$param = static::get_param($parname);
+		$param = static::get_required_param($parname);
 
-		if ($param === null) {
-			print_error('param not found: '.$parname);
-		} else {
-			return static::clean_object($param, $definition);
-		}
+		return static::clean_object($param, $definition);
 	}
 	
 	public static function required_json($parname, $definition = null) {
@@ -330,7 +390,7 @@ function _plugin_name() {
  * This method is neccessary because a project based evaluation is available in the current exastud
  * version, which requires a different naming.
  */
-function get_string($identifier, $component = null, $a = null, $lazyload = false) {
+function get_string($identifier, $component = null, $a = null) {
 	$manager = get_string_manager();
 
 	if ($component === null)
@@ -343,7 +403,7 @@ function get_string($identifier, $component = null, $a = null, $lazyload = false
 }
 
 function _t_check_identifier($string) {
-	if (preg_match('!^([^:]+):(.*)$!', $string, $matches))
+	if (preg_match('!^([^:]+):(.*)$!s', $string, $matches))
 		return $matches;
 	else
 		return null;
@@ -351,7 +411,7 @@ function _t_check_identifier($string) {
 function _t_parse_string($string, $a) {
 	// copy from moodle/lib/classes/string_manager_standard.php
 	// Process array's and objects (except lang_strings).
-	if (is_array($a) or (is_object($a) && !($a instanceof lang_string))) {
+	if (is_array($a) or (is_object($a) && !($a instanceof \lang_string))) {
 		$a = (array)$a;
 		$search = array();
 		$replace = array();
@@ -360,7 +420,7 @@ function _t_parse_string($string, $a) {
 				// We do not support numeric keys - sorry!
 				continue;
 			}
-			if (is_array($value) or (is_object($value) && !($value instanceof lang_string))) {
+			if (is_array($value) or (is_object($value) && !($value instanceof \lang_string))) {
 				// We support just string or lang_string as value.
 				continue;
 			}
@@ -438,22 +498,6 @@ function trans() {
 	}
 }
 
-function trigger_event($event, array $data) {
-	// maybe check, if event starts with backslash, then it's a whole event class name
-	// maybe check, if event is an object, then we don't have to create one
-	$class = "\\"._plugin_name()."\\event\\$event";
-
-	if (!isset($data['contextid']) && isset($data['courseid'])) {
-		if ($data['courseid']) {
-			$data['contextid'] = \context_course::instance($data['courseid'])->id;
-		} else {
-			$data['contextid'] = \context_system::instance()->id;
-		}
-	}
-
-	return $class::create($data)->trigger();
-}
-
 /* the whole part below is done, so eclipse knows the common classes and functions */
 namespace block_exa2fa;
 
@@ -475,13 +519,13 @@ function _export_function($function) {
 }
 
 // export classnames, if not already existing
-if (_should_export_class('exception')) { class exception extends common\exception {} }
 if (_should_export_class('db')) { class db extends common\db {} }
-if (_should_export_class('param')) { class param extends common\param {} }
-if (_should_export_class('url')) { class url extends common\url {} }
-if (_should_export_class('SimpleXMLElement')) { class SimpleXMLElement extends common\SimpleXMLElement {} }
+if (_should_export_class('event')) { abstract class event extends common\event {} }
+if (_should_export_class('exception')) { class exception extends common\exception {} }
 if (_should_export_class('globals')) { class globals extends common\globals {} }
+if (_should_export_class('param')) { class param extends common\param {} }
+if (_should_export_class('SimpleXMLElement')) { class SimpleXMLElement extends common\SimpleXMLElement {} }
+if (_should_export_class('url')) { class url extends common\url {} }
 
-if (_export_function('trans')) { function trans() {} }
 if (_export_function('get_string')) { function get_string($identifier) {} }
-if (_export_function('trigger_event')) { function trigger_event($event, array $data) {} }
+if (_export_function('trans')) { function trans() {} }

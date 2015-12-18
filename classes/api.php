@@ -4,13 +4,13 @@ namespace block_exa2fa;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__.'/../lib/lib.php';
+require_once __DIR__.'/../inc.php';
 
 class api {
 	static function user_login($username, $password) {
-		global $CFG, $DB, $USER;
-		
-		if (!empty($USER->username) && $USER->username == $username) {
+		global $CFG, $DB;
+
+		if (isloggedin() && !isguestuser())  {
 			// the user is already logged in
 			// then this function is called for password change -> no a2fa needed here
 			return true;
@@ -46,13 +46,11 @@ class api {
 	}
 
 	static function user_update_password($user, $newpassword) {
-		global $USER;
-
-		if (!empty($USER->username) && $USER->username == $user->username) {
+		if (isloggedin() && !isguestuser())  {
 			// the user is already logged in
-			// then this function is called for normal password change
+			// then this function is called for a normal password change
 		} else {
-			// the user is not logged in
+			// the user is not logged in, which is probably a password reset request
 			// reset the session when changing password to log him out
 			\core\session\manager::terminate_current();
 		}

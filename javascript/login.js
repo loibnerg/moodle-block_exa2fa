@@ -1,4 +1,7 @@
 $(function(){
+	var $form = $('form#login');
+	$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/login/');
+	
 	// add a2fa to form
 	$('.loginform').wrapInner('<div id="username-password"></div>');
 	$('.loginform').append(
@@ -11,9 +14,18 @@ $(function(){
 		'</div>'
 	);
 
-	var $form = $('form#login');
-	$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/login/');
-	
+	$('.forgetpass').addClass('original');
+	$(
+		'<div class="forgetpass a2fa" style="display: none;">' +
+		'   <a href="#">A2fa Code vergessen?</a>' +
+		'</div>'
+	).insertAfter('.forgetpass').click(function(){
+		$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/send_a2fa.php');
+		// submit the form, without triggering the special login handler
+		$form[0].submit();
+	});
+
+
 	function login() {
 		// Send the data using post
 		return $.ajax({
@@ -60,6 +72,9 @@ $(function(){
 				$('#a2fa-token-form').show();
 				$('input').attr('disabled', null);
 				$('input[name=token]').focus();
+
+				$('.forgetpass.original').hide();
+				$('.forgetpass.a2fa').show();
 
 				$form.find('input[name=token]').val('');
 			} else if (data.url) {
