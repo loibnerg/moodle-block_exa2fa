@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * functions common accross exabis plugins
+ */
+
 namespace block_exa2fa\common;
-/* functions common accross exabis plugins */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -130,23 +133,45 @@ class SimpleXMLElement extends \SimpleXMLElement {
 	}
 }
 
-class db {
+abstract class exadb extends \moodle_database {
+	public function update_record($table, $data, $where=null) {
+	}
+	public function insert_or_update_record($table, $data, $where = null) {
+	}
+}
+class exadb_forwarder {
+	function __call($func, $args) {
+		global $DB;
+
+		if (method_exists($DB, $func)) {
+		 	// in exadb class
+			return call_user_func_array([$DB, $func], $args);
+		}
+
+		throw new \coding_exception(" Call to undefined method g::\$DB->$func");
+	}
+}
+
+class exadb_extender extends exadb_forwarder {
+
 	/**
 	 * @param $table
 	 * @param $data
 	 * @param $where
-	 * @return null|object
+	 * @return null|bool|object
 	 */
-	public static function update_record($table, $data, $where) {
-		global $DB;
+	public function update_record($table, $data, $where=null) {
+		if ($where === null) {
+			return parent::update_record($table, $data);
+		}
 
 		$where = (array)$where;
 		$data = (array)$data;
 
-		if ($dbItem = $DB->get_record($table, $where)) {
+		if ($dbItem = $this->get_record($table, $where)) {
 			if ($data) {
 				$data['id'] = $dbItem->id;
-				$DB->update_record($table, (object)$data);
+				parent::update_record($table, (object)$data);
 			}
 
 			return (object)($data + (array)$dbItem);
@@ -162,18 +187,16 @@ class db {
 	 * @return object
 	 * @throws exception
 	 */
-	public static function insert_or_update_record($table, $data, $where = null) {
-		global $DB;
-
+	public function insert_or_update_record($table, $data, $where = null) {
 		$data = (array)$data;
 
-		if ($dbItem = $DB->get_record($table, $where !== null ? $where : $data)) {
+		if ($dbItem = $this->get_record($table, $where !== null ? $where : $data)) {
 			if (empty($data)) {
 				throw new exception('$data is empty');
 			}
 
 			$data['id'] = $dbItem->id;
-			$DB->update_record($table, (object)$data);
+			$this->update_record($table, (object)$data);
 
 			return (object)($data + (array)$dbItem);
 		} else {
@@ -181,7 +204,7 @@ class db {
 			if ($where !== null) {
 				$data = $data + $where; // first the values of $data, then of $where, but don't override $data
 			}
-			$id = $DB->insert_record($table, (object)$data);
+			$id = $this->insert_record($table, (object)$data);
 			$data['id'] = $id;
 
 			return (object)$data;
@@ -334,7 +357,7 @@ class _globals_dummy_CFG {
 
 class globals {
 	/**
-	 * @var \moodle_database
+	 * @var exadb
 	 */
 	public static $DB;
 
@@ -369,8 +392,8 @@ class globals {
 	public static $CFG;
 	
 	public static function init() {
-		global $DB, $PAGE, $OUTPUT, $COURSE, $USER, $CFG, $SITE;
-		globals::$DB =& $DB;
+		global $PAGE, $OUTPUT, $COURSE, $USER, $CFG, $SITE;
+		globals::$DB = new exadb_extender();
 		globals::$PAGE =& $PAGE;
 		globals::$OUTPUT =& $OUTPUT;
 		globals::$COURSE =& $COURSE;
@@ -386,9 +409,11 @@ function _plugin_name() {
 }
 
 /**
- * Returns a localized string.
- * This method is neccessary because a project based evaluation is available in the current exastud
- * version, which requires a different naming.
+ * get a language string from current plugin or else from global language strings
+ * @param $identifier
+ * @param null $component
+ * @param null $a
+ * @return string
  */
 function get_string($identifier, $component = null, $a = null) {
 	$manager = get_string_manager();
@@ -400,6 +425,10 @@ function get_string($identifier, $component = null, $a = null) {
 		return $manager->get_string($identifier, $component, $a);
 
 	return $manager->get_string($identifier, '', $a);
+}
+
+function print_error($errorcode, $module = 'error', $link = '', $a = null, $debuginfo = null) {
+	throw new exception($errorcode, $module, $link, $a, $debuginfo);
 }
 
 function _t_check_identifier($string) {
@@ -433,31 +462,32 @@ function _t_parse_string($string, $a) {
 	} else {
 		$string = str_replace('{$a}', (string)$a, $string);
 	}
-	
+
 	return $string;
 }
+
 /*
  * translator function
  */
 function trans() {
-	
+
 	$origArgs = $args = func_get_args();
-	
+
 	$languagestrings = null;
 	$identifier = '';
 	$a = null;
-	
+
 	if (empty($args)) {
 		print_error('no args');
 	}
-	
+
 	$arg = array_shift($args);
 	if (is_string($arg) && !_t_check_identifier($arg)) {
 		$identifier = $arg;
 
 		$arg = array_shift($args);
 	}
-	
+
 	if ($arg === null) {
 		// just id submitted
 		$languagestrings = array();
@@ -468,11 +498,11 @@ function trans() {
 	} else {
 		print_error('wrong args: '.print_r($origArgs, true));
 	}
-	
+
 	if (!empty($args)) {
 		$a = array_shift($args);
 	}
-	
+
 	// parse $languagestrings
 	foreach ($languagestrings as $lang => $string) {
 		if (is_number($lang)) {
@@ -483,11 +513,11 @@ function trans() {
 			}
 		}
 	}
-	
+
 	if (!empty($args)) {
 		print_error('too many args: '.print_r($origArgs, true));
 	}
-	
+
 	$lang = current_language();
 	if (isset($languagestrings[$lang])) {
 		return _t_parse_string($languagestrings[$lang], $a);
@@ -498,7 +528,10 @@ function trans() {
 	}
 }
 
-/* the whole part below is done, so eclipse knows the common classes and functions */
+/**
+ * exporting all classes and functions from the common namespace to the plugin namespace
+ * the whole part below is done, so eclipse knows the common classes and functions
+ */
 namespace block_exa2fa;
 
 function _should_export_class($classname) {
@@ -519,7 +552,6 @@ function _export_function($function) {
 }
 
 // export classnames, if not already existing
-if (_should_export_class('db')) { class db extends common\db {} }
 if (_should_export_class('event')) { abstract class event extends common\event {} }
 if (_should_export_class('exception')) { class exception extends common\exception {} }
 if (_should_export_class('globals')) { class globals extends common\globals {} }
@@ -527,5 +559,6 @@ if (_should_export_class('param')) { class param extends common\param {} }
 if (_should_export_class('SimpleXMLElement')) { class SimpleXMLElement extends common\SimpleXMLElement {} }
 if (_should_export_class('url')) { class url extends common\url {} }
 
-if (_export_function('get_string')) { function get_string($identifier) {} }
+if (_export_function('get_string')) { function get_string($identifier, $component = null, $a = null) {} }
+if (_export_function('print_error')) { function print_error($errorcode, $module = 'error', $link = '', $a = null, $debuginfo = null) {} }
 if (_export_function('trans')) { function trans() {} }

@@ -111,7 +111,7 @@ class user_setting {
 			'secret' => $secret
 		];
 
-		\block_exa2fa\db::insert_or_update_record('block_exa2fauser', $data, ['userid' => $this->user->id]);
+		\block_exa2fa\globals::$DB->insert_or_update_record('block_exa2fauser', $data, ['userid' => $this->user->id]);
 		
 		g::$DB->update_record('user', [
 			'id' => $this->user->id,
@@ -122,7 +122,7 @@ class user_setting {
 	}
 	
 	function deactivate() {
-		\block_exa2fa\db::update_record('block_exa2fauser', [
+		\block_exa2fa\globals::$DB->update_record('block_exa2fauser', [
 			'a2faactive' => 0
 		], ['userid' => $this->user->id]);
 	
