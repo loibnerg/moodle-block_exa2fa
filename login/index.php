@@ -8,7 +8,7 @@ if (isloggedin() and !isguestuser()) {
 
 $CFG->alternateloginurl = null;
 
-if ($SESSION->wantsurl && preg_match('!/login/!', $SESSION->wantsurl)) {
+if (!empty($SESSION->wantsurl) && preg_match('!/login/!', $SESSION->wantsurl)) {
 	$SESSION->wantsurl = null;
 }
 
