@@ -74,9 +74,11 @@ if ($action == 'deactivate') {
 
 	echo '<div style="text-align: center;">Dein neuer a2fa Code lautet: '.$secret.'<br />';
 
-	echo '<br />Bitte scan den untenstehenden QR Code mit der Auth App ein und bestätige mit dem generierten Einmalpasswort<br />';
+	echo '<h2>1. Bitte scannen Sie den QR Code mit einer Auth App (z.B. FreeOTP) ein.</h2>';
 
 	echo $img;
+
+	echo '<h2>2. Geben Sie zur Kontrolle den in der Auth App generierten 6-stelligen Code ein.</h2>';
 
 	if ($error) {
 		echo '<div class="alert alert-error">'.$error.'</div>';
