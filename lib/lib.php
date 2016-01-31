@@ -7,7 +7,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once __DIR__.'/common.php';
 require_once __DIR__.'/GoogleAuthenticator.php';
 
-use \block_exa2fa\globals as g;
+use block_exa2fa\globals as g;
 
 class user_setting {
 	
