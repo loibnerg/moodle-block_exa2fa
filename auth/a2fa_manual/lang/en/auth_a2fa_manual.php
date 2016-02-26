@@ -1,26 +1,21 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Exabis A2fa
 //
-// Moodle is free software: you can redistribute it and/or modify
+// (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
+//
+// Exabis A2fa is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// This script is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-/**
- * Strings for component 'auth_a2fa_manual', language 'en'.
- *
- * @package   auth_a2fa_manual
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+// You can find the GNU General Public License at <http://www.gnu.org/licenses/>.
+//
+// This copyright notice MUST APPEAR in all copies of the script!
 
 $string['auth_a2fa_manualdescription'] = 'A2FA: Manual Accounts';
 $string['pluginname'] = 'A2FA: Manual Accounts';
