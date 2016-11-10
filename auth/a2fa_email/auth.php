@@ -29,9 +29,10 @@ class auth_plugin_a2fa_email extends auth_plugin_email {
 	/**
 	 * Constructor.
 	 */
-	function auth_plugin_a2fa_email() {
-		parent::auth_plugin_email();
+	function __construct() {
+		parent::__construct();
 		$this->authtype = 'a2fa_email';
+        $this->errorlogtag = '[AUTH A2FA_EMAIL] ';
 	}
 
 	/**

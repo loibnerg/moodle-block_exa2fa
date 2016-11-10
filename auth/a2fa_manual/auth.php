@@ -29,9 +29,10 @@ class auth_plugin_a2fa_manual extends auth_plugin_manual {
 	/**
 	 * Constructor.
 	 */
-	function auth_plugin_a2fa_manual() {
-		parent::auth_plugin_manual();
+	function __construct() {
+		parent::__construct();
 		$this->authtype = 'a2fa_manual';
+        $this->errorlogtag = '[AUTH A2FA_MANUAL] ';
 	}
 
 	/**

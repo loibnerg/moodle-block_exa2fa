@@ -29,9 +29,10 @@ class auth_plugin_a2fa_ldap extends auth_plugin_ldap {
 	/**
 	 * Constructor.
 	 */
-	function auth_plugin_a2fa_ldap() {
-		$this->init_plugin('ldap');
+	function __construct() {
+		parent::__construct();
 		$this->authtype = 'a2fa_ldap';
+        $this->errorlogtag = '[AUTH A2FA_LDAP] ';
 	}
 
 	/**
