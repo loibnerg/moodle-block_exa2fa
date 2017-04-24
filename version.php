@@ -23,3 +23,4 @@ $plugin->version   = 2016111000;		// The current plugin version (Date: YYYYMMDDX
 $plugin->requires  = 2014050800;		// Requires this Moodle version
 $plugin->component = 'block_exa2fa';	   // Full name of the plugin (used for diagnostics)
 $plugin->release = '4.5.0';
+$plugin->maturity = MATURITY_STABLE;
