@@ -1,9 +1,9 @@
 <?php
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -44,6 +44,6 @@ function block_exa2fa_myprofile_navigation($tree, $user, $iscurrentuser, $course
 		return;
 	}
 	
-	$node = new core_user\output\myprofile\node('contact', 'a2fa_settings', \block_exa2fa\trans('de:A2fa Einstellungen'), null, null, $content);
+	$node = new core_user\output\myprofile\node('contact', 'a2fa_settings', block_exa2fa_trans(['de:A2fa Einstellungen', 'en:A2fa Settings']), null, null, $content);
 	$tree->add_node($node);
 }

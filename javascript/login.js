@@ -1,8 +1,8 @@
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -17,32 +17,41 @@
 // This copyright notice MUST APPEAR in all copies of the script!
 
 $(function(){
-	var $form = $('form#login');
+	var $form = $('form#login2');
+	if (!$form.length) {
+		// try to find other form
+		$form = $(':password:first').closest('form');
+	}
+
 	$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/login/');
-	
+
+	var strA2faPassword = $('html').attr('lang') == 'de' ? 'Authenticator Einmalpasswort' : 'A2fa Code';
+	var strForgotPassword = $('html').attr('lang') == 'de' ? 'A2fa Code vergessen?' : 'Forgot your A2fa Code?';
+
 	// add a2fa to form
-	$('.loginform').wrapInner('<div id="username-password"></div>');
-	$('.loginform').append(
-		'<div id="a2fa-token-form" style="display: none;">' +
+	var $innerWrap = $form.wrapInner('<div/>').children();
+	var $tokenForm = $(
+		'<div id="a2fa-token-form">' +
 		'	<div class="clearer"><!-- --></div>' +
-		'	<div class="form-label"><label for="token">Authenticator Einmalpasswort</label></div>' +
+		'	<div class="form-label"><label for="token">'+strA2faPassword+'</label></div>' +
 		'	<div class="form-input">' +
-		'		<input type="text" name="token" id="token" size="15" value="" />' +
+		'		<input type="text" name="token" id="token" size="15" value="" class="form-control"/>' +
 		'	</div>' +
 		'</div>'
-	);
+	).hide().appendTo($form);
 
-	$('.forgetpass').addClass('original');
-	$(
-		'<div class="forgetpass a2fa" style="display: none;">' +
-		'   <a href="#">A2fa Code vergessen?</a>' +
-		'</div>'
-	).insertAfter('.forgetpass').click(function(){
-		$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/send_a2fa.php');
-		// submit the form, without triggering the special login handler
-		$form[0].submit();
-	});
+	$('<div><a href="#">'+strForgotPassword+'</a></div>')
+		.appendTo($tokenForm)
+		.find('a').click(function(){
+			$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/send_a2fa.php');
+			// submit the form, without triggering the special login handler
+			$form[0].submit();
+		});
 
+
+
+	// add submit button also to token form
+	$form.find(':submit').clone().appendTo($tokenForm);
 
 	function login() {
 		// Send the data using post
@@ -63,7 +72,7 @@ $(function(){
 	
 	function error(errorText) {
 		$('.loginerrors').remove();
-		$form.before('<div class="loginerrors"><span class="error">'+errorText+'</span></div>');
+		$form.before('<div class="loginerrors"><div class="alert alert-danger" role="alert"><span class="error">'+errorText+'</span></div></div>');
 	}
 	
 	$form.submit(function(event){
@@ -86,15 +95,10 @@ $(function(){
 				error(data['a2fa-error']);
 
 				// a2fa error
-				$('#username-password').hide();
-				$('#a2fa-token-form').show();
+				$innerWrap.hide();
+				$tokenForm.show();
 				$('input').attr('disabled', null);
-				$('input[name=token]').focus();
-
-				$('.forgetpass.original').hide();
-				$('.forgetpass.a2fa').show();
-
-				$form.find('input[name=token]').val('');
+				$('input[name=token]').val('').focus();
 			} else if (data.url) {
 				// we got an url -> redirect
 				window.setTimeout(function(){

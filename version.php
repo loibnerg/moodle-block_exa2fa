@@ -1,9 +1,9 @@
 <?php
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -19,8 +19,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016111000;		// The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2017080800;		// The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2014050800;		// Requires this Moodle version
 $plugin->component = 'block_exa2fa';	   // Full name of the plugin (used for diagnostics)
-$plugin->release = '4.5.0';
+$plugin->release = '4.6.1';
 $plugin->maturity = MATURITY_STABLE;

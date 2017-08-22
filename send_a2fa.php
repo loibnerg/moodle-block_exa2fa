@@ -1,9 +1,9 @@
 <?php
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -20,7 +20,7 @@
 require_once __DIR__.'/inc.php';
 require_once $CFG->dirroot.'/login/lib.php';
 
-$PAGE->set_url($_SERVER['REQUEST_URI']);
+$PAGE->set_url('/blocks/exa2fa/send_a2fa.php');
 $PAGE->set_context(context_system::instance());
 
 $username = required_param('username', PARAM_USERNAME);
@@ -55,7 +55,8 @@ function block_exa2fa_send_password_change_confirmation_email($user, $resetrecor
     $data->admin     = generate_email_signoff();
     $data->resetminutes = $pwresetmins;
 
-    $message = \block_exa2fa\trans('de:Guten Tag {$a->firstname},
+    $message = block_exa2fa_trans([
+    	'de:Guten Tag {$a->firstname},
 
 jemand (wahrscheinlich Sie) hat bei \'{$a->sitename}\' das Zurücksetzen des A2fa Codes für das Nutzerkonto \'{$a->username}\' angefordert.
 
@@ -70,19 +71,40 @@ Bei Problemen wenden Sie sich bitte an die Administrator/innen der Website.
 
 Viel Erfolg!
 
-{$a->admin}', $data);
-    $subject = \block_exa2fa\trans('de:{$a}: A2fa Code zurücksetzen', format_string($site->fullname));
+{$a->admin}',
+		'en:Dear {$a->firstname},
+
+you have requested to reset your A2fa Code of \'{$a->username}\' on \'{$a->sitename}\'.
+
+Please click the link below to disable your A2fa Code:
+
+{$a->link}
+
+Note:
+The Link is only active for {$a->resetminutes} minutes.
+
+If you experience any Problems, please contact your Moodle Support.
+
+Sincerely,
+{$a->admin}'
+	], $data);
+    $subject = block_exa2fa_trans([
+    	'de:{$a}: A2fa Code zurücksetzen',
+		'en:{$a}: Reset A2fa Code'
+	], format_string($site->fullname));
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
     return email_to_user($user, $supportuser, $subject, $message);
-
 }
 
 // always show ok message
 
 echo $OUTPUT->header();
 
-$msg = \block_exa2fa\trans('de:Die Anleitung zum Zurücksetzen des A2fa Codes wurde Ihnen per E-Mail gesendet.');
+$msg = block_exa2fa_trans([
+	'de:Die Anleitung zum Zurücksetzen des A2fa Codes wurde dir per E-Mail gesendet.',
+	'en:We have sent you an email with the instructions on how to reset your A2fa Code.'
+]);
 notice('<div style="text-align: center; padding: 30px;">'.$msg.'</div>', $CFG->wwwroot.'/index.php');
 
 echo $OUTPUT->footer();

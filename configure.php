@@ -1,9 +1,9 @@
 <?php
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -50,7 +50,7 @@ if ($action == 'deactivate') {
 			redirect($returnurl);
 		}
 
-		$error = 'Der eingegebene Code ist falsch';
+		$error = block_exa2fa_trans(['de:Der eingegebene Code ist falsch', 'en:Sorry, this code is wrong']);
 	}
 
 	if (!$secret) {
@@ -69,30 +69,39 @@ if ($action == 'deactivate') {
 
 	echo $OUTPUT->header();
 
-	echo '<div style="text-align: center;">Dein neuer a2fa Code lautet: '.$secret.'<br />';
+	echo '<div style="text-align: center;">'.block_exa2fa_trans([
+			'de:Dein neuer A2fa Code lautet: {$a}',
+			'en:Your new A2fa Code: {$a}'], $secret).
+		'<br />';
 
-	echo '<h2>1. Bitte scannen Sie den QR Code mit einer Auth App (z.B. FreeOTP) ein.</h2>';
+	echo '<h2>1. '.block_exa2fa_trans([
+			'de:Bitte scannen Sie den QR Code mit einer Auth App (z.B. FreeOTP) ein.',
+			'en:Please scan the QR with your Auth App (eg. FreeOTP)']).
+		'</h2>';
 
 	echo $img;
 
-	echo '<h2>2. Geben Sie zur Kontrolle den in der Auth App generierten 6-stelligen Code ein.</h2>';
+	echo '<h2>2. '.block_exa2fa_trans([
+			'de:Geben Sie zur Kontrolle den in der Auth App generierten 6-stelligen Code ein.',
+			'en:To activate your A2fa Login insert the 6-digit Code from your App']).
+		'</h2>';
 
 	if ($error) {
 		echo '<div class="alert alert-error">'.$error.'</div>';
 	}
 
 	?>
-		<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-			<input type="hidden" name="secret" value="<?php echo $secret; ?>" />
-			<input type="text" name="token" size="15" value="" />
-			<input type="submit" value="Bestätigen" />
-		</form>
+	<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+		<input type="hidden" name="secret" value="<?php echo $secret; ?>"/>
+		<input type="text" name="token" size="15" value=""/>
+		<input type="submit" value="<?php echo block_exa2fa_trans(['de:Bestätigen', 'en:Check Code']); ?>"/>
+	</form>
 	<?php
 
 	echo '<br /><br />';
-	echo \html_writer::empty_tag('input', ['type'=>'button',
-			'value'=>\block_exa2fa\trans('zurück'),
-			'onclick'=>'document.location.href='.json_encode($returnurl->out(false))]);
+	echo \html_writer::empty_tag('input', ['type' => 'button',
+		'value' => block_exa2fa_get_string('back'),
+		'onclick' => 'document.location.href='.json_encode($returnurl->out(false))]);
 
 	echo $OUTPUT->footer();
 } else {

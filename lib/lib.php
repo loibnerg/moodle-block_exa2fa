@@ -1,9 +1,9 @@
 <?php
-// This file is part of Exabis A2fa
+// This file is part of Moodle - http://moodle.org/
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis A2fa is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -61,19 +61,19 @@ class user_setting {
 		$url = new \moodle_url('/blocks/exa2fa/configure.php', ['action'=>null, 'returnurl' => (new \moodle_url(g::$PAGE->url))->out_as_local_url(false)]);
 		
 		if ($data = $this->is_a2fa_active()) {
-			$output  = '<div style="text-align: center;">A2fa ist aktiv.<br />';
+			$output  = '<div style="text-align: center;">'.block_exa2fa_trans(['de:A2fa ist aktiv', 'en:A2fa is active']).'<br />';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
-							'value'=>\block_exa2fa\trans('Neuen Code generieren'),
+							'value'=>block_exa2fa_trans(['de:Neuen Code generieren', 'en:Generate a new Code']),
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'generate']))]);
 			$output .= '&nbsp;&nbsp;';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
-							'value'=>\block_exa2fa\trans('A2fa deaktivieren'),
+							'value'=>block_exa2fa_trans(['de:A2fa deaktivieren', 'en:Disable A2fa']),
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'deactivate']))]);
 			$output .= '</div>';
 		} else {
-			$output  = '<div style="text-align: center;">Hier kannst du A2fa aktivieren um Moodle noch sicherer zu machen.<br /><br />';
+			$output  = '<div style="text-align: center;">'.block_exa2fa_trans(['de:Hier kannst du A2fa aktivieren um Moodle noch sicherer zu machen.', 'en:Activate A2fa to make your Moodle login more secure.']).'<br /><br />';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
-							'value'=>\block_exa2fa\trans('A2fa aktivieren'),
+							'value'=>block_exa2fa_trans(['de:A2fa aktivieren', 'en:Enable A2fa']),
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'activate']))]);
 			$output .= '</div>';
 		}
@@ -92,7 +92,7 @@ class user_setting {
 			
 			$output  = '<div style="text-align: center;">';
 			$output .= \html_writer::empty_tag('input', ['type'=>'button',
-							'value'=>\block_exa2fa\trans('A2fa deaktivieren'),
+							'value'=>block_exa2fa_trans(['de:A2fa deaktivieren', 'en:Disable A2fa']),
 							'onclick'=>'document.location.href='.json_encode($url->out(false, ['action' => 'deactivate']))]);
 			$output .= '</div>';
 			return $output;
