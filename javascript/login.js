@@ -21,8 +21,8 @@ $(function(){
 	$form.attr('action', M.cfg.wwwroot+'/blocks/exa2fa/login/');
 	
 	// add a2fa to form
-	$('.loginform').wrapInner('<div id="username-password"></div>');
-	$('.loginform').append(
+	$form.wrapInner('<div id="username-password"></div>');
+	$form.append(
 		'<div id="a2fa-token-form" style="display: none;">' +
 		'	<div class="clearer"><!-- --></div>' +
 		'	<div class="form-label"><label for="token">Authenticator Einmalpasswort</label></div>' +
